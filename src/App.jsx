@@ -1,6 +1,12 @@
+import { Controller } from "./components";
+
 function App() {
   return (
-    <div></div>
+    <div>
+      <div>
+        <Controller />
+      </div>
+    </div>
   );
 }
 
