@@ -1,5 +1,9 @@
 import { fireEvent, render, waitFor, screen } from "@testing-library/react";
+import { matchers } from "@emotion/jest";
 import Canvas from "./Canvas";
+
+// emotion matchers 추가
+expect.extend(matchers);
 
 describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)를 차례대로 실행시 정상 동작 하는가?", () => {
   let getByTestId, canvasDiv, tempDiv;
@@ -28,20 +32,21 @@ describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)
     // 마우스를 왼쪽으로 100px, 아래로 100px 움직인다.
     fireEvent.mouseMove(canvasDiv, { clientX: 100, clientY: 100 });
     
-    await waitFor(() => {      
-      expect(tempDiv.style.width).toBe("100px");
-      expect(tempDiv.style.height).toBe("100px");
-    })
+    expect(tempDiv.style.width).toBe("100px");
+    expect(tempDiv.style.height).toBe("100px");
   });
 
   test("MouseUp 이벤트 발생시 컴포넌트 하위에 temp-div 클래스를 가진 div가 삭제되고 Shape 컴포넌트가 생성되는가?", async () => {
+    // 마우스를 왼쪽으로 100px, 아래로 100px 움직인다.
+    fireEvent.mouseMove(canvasDiv, { clientX: 100, clientY: 100 });
+
     fireEvent.mouseUp(canvasDiv);
     tempDiv = Array.from(canvasDiv.childNodes).find(node => node.classList.contains("temp-div"));
     expect(tempDiv).not.toBeDefined();
-
+    
     const shape = screen.getByTestId("shape");
     expect(shape).toBeInTheDocument();
-    expect(shape.style.width).toBe("100px");
-    expect(shape.style.height).toBe("100px");
+    expect(shape).toHaveStyleRule("width", "100px");
+    expect(shape).toHaveStyleRule("height", "100px");
   })
 })

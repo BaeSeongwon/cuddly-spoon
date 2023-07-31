@@ -3,18 +3,8 @@ import { Circle } from "./shapes";
 
 test("캔버스에 마우스 클릭시 도형(네모, 동그라미) Dom(.temp-div)이 생성된다.", () => {
   const canvasHandler = CanvasHandler();
-  const mockShape = {
-    getShapeInfo: jest.fn().mockReturnValue({
-      width: '5px',
-      height: '5px',
-      border: '1px solid black',
-      position: 'absolute',
-      left: `10px`,
-      top: `10px`,
-      borderRadius: '0px'
-    }) 
-  }
-  const element = canvasHandler.getElementDom(mockShape);
+
+  const element = canvasHandler.getElementDom(new Circle(0 , 0));
   expect(element).toBeInstanceOf(HTMLElement);
   expect(element).toHaveAttribute('class', 'temp-div');
 })

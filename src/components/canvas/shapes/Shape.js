@@ -1,5 +1,8 @@
 class Shape {
   constructor(left, top) {
+    left = left ? left : 0;
+    top = top ? top : 0;
+
     this.width = '5px';
     this.height = '5px';
     this.border = '1px solid black';
