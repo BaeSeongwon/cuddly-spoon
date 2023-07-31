@@ -1,16 +1,23 @@
 /** @jsxImportSource @emotion/react */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
+import { Circle, Square } from "../canvas/shapes";
 
 import PropTypes from "prop-types";
 import ControllerButton from "./ControllerButton";
 
-function Controller({onChangeShape, onClearCanvas}) {
-  const [ activeButton, setActiveButton ] = useState('circle');
+function Controller({initActiveButton, onChangeShape, onClearCanvas}) {
+  const [ activeButton, setActiveButton ] = useState(null);
   const button_container = css({
     display: 'inline-block',
     margin: '0px 5px'
   });
+
+  useEffect(() => {
+    if(initActiveButton) {
+      handleChangeShape(initActiveButton);
+    }
+  }, []);
 
   const getActive = (type) => {
     if(type && activeButton === type) {
@@ -22,7 +29,12 @@ function Controller({onChangeShape, onClearCanvas}) {
 
   const handleChangeShape = (shape) => {
     setActiveButton(shape);
-    onChangeShape(shape);
+
+    if(shape === "box") {
+      onChangeShape(new Square());
+    } else if(shape === "circle") {
+      onChangeShape(new Circle());
+    }    
   }
 
   return (
@@ -52,11 +64,13 @@ function Controller({onChangeShape, onClearCanvas}) {
 }
 
 Controller.propTypes = {
-  onChangeShape: PropTypes.func,
-  onClearCanvas: PropTypes.func
+  initActiveButton: PropTypes.string.isRequired,
+  onChangeShape: PropTypes.func.isRequired,
+  onClearCanvas: PropTypes.func.isRequired
 }
 
 Controller.defaultProps = {
+  initActiveButton: 'box',
   onChangeShape: () => {},
   onClearCanvas: () => {}
 }

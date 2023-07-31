@@ -3,23 +3,26 @@ import { useState, useRef, Fragment } from "react";
 import { css } from "@emotion/react";
 import { Square, Circle } from "./shapes";
 
+import PropTypes from "prop-types";
 import CanvasHandler from "./CanvasHandler";
 import Shape from "./Shape";
 
-function Canvas() {
+function Canvas({shape}) {
   const [ shapeList, setShapeList ] = useState([]);
   const canvasRef = useRef();
   const canvasHandler = new CanvasHandler();
 
   const handleMouseDown = (e) => {
-    if(canvasRef) {
+    if(canvasRef && shape) {
       canvasHandler.removeElementDom();
       canvasHandler.setDragState(true);
       
-      const shape = new Square(e.clientX, e.clientY);
+      shape.init(e.clientX, e.clientY);
       const shapeElement = canvasHandler.getElementDom(shape);
 
-      canvasRef.current.appendChild(shapeElement);
+      if(shapeElement) {
+        canvasRef.current.appendChild(shapeElement);
+      }
     }    
   }
 
@@ -61,6 +64,18 @@ function Canvas() {
       ))}
     </div>
   )
+}
+
+Canvas.propTypes = {
+  shape: PropTypes.oneOfType([
+    PropTypes.instanceOf(Square).isRequired,
+    PropTypes.instanceOf(Circle).isRequired,
+    PropTypes.oneOf([null]).isRequired
+  ])
+}
+
+Canvas.defaultProps = {
+  shape: null
 }
 
 export default Canvas;

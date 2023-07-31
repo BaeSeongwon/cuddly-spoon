@@ -1,8 +1,21 @@
 /** @jsxImportSource @emotion/react */
+import { useState } from "react";
 import { css } from "@emotion/react";
 import { Controller, Canvas } from "./components";
 
 function App() {
+  const [ selectedShape, setSelectedShape ] = useState(null);
+
+  const handleChangeShape = (shape) => {
+    if(shape) {
+      setSelectedShape(shape);
+    }
+  }
+
+  const handleClearCanvas = () => {
+
+  }
+
   return (
     <div
       css={css({
@@ -11,7 +24,11 @@ function App() {
       })}
     >
       <div>
-        <Controller />
+        <Controller
+          initActiveButton={'box'}
+          onChangeShape={handleChangeShape}
+          onClearCanvas={handleClearCanvas}
+        />
       </div>
       <div
         css={css({
@@ -19,7 +36,9 @@ function App() {
           padding: '10px 0px'
         })}
       >
-        <Canvas />
+        <Canvas 
+          shape={selectedShape}
+        />
       </div>
     </div>
   );

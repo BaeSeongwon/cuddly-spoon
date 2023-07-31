@@ -9,8 +9,17 @@ class Shape {
     this.position = 'absolute';
     this.left = `${left}px`;
     this.top = `${top}px`;
-    this.initLeft = `${left}`;
-    this.initTop = `${top}`;
+    this.initLeft = left;
+    this.initTop = top;
+  }
+
+  init(left, top) {
+    this.left = `${left}px`;
+    this.top = `${top}px`;
+    this.initLeft = left;
+    this.initTop = top;
+    this.width = '5px';
+    this.height = '5px';
   }
 
   getShapeInfo() {

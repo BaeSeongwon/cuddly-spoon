@@ -1,5 +1,7 @@
-import { fireEvent, render, waitFor, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { matchers } from "@emotion/jest";
+import { Circle, Square } from './shapes';
+
 import Canvas from "./Canvas";
 
 // emotion matchers 추가
@@ -9,14 +11,12 @@ describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)
   let getByTestId, canvasDiv, tempDiv;
 
   beforeEach(async () => {
-    ({ getByTestId } = render(<Canvas />));
+    ({ getByTestId } = render(<Canvas shape={Square} />));
     canvasDiv = getByTestId("canvas");
     fireEvent.mouseDown(canvasDiv);
 
-    await waitFor(() => {
-      tempDiv = Array.from(canvasDiv.childNodes).find(node => node.classList.contains("temp-div"));
-      expect(tempDiv).toBeDefined();
-    })
+    tempDiv = Array.from(canvasDiv.childNodes).find(node => node.classList.contains("temp-div"));
+    expect(tempDiv).toBeDefined();
   })
 
   test("MouseDown 이벤트 발생시 Canvas 컴포넌트 하위에 temp-div 클래스를 가진 div가 추가 되는가?", async () => {
