@@ -1,24 +1,33 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useRef, Fragment } from "react";
+import { useState, useRef, Fragment, useEffect } from "react";
 import { css } from "@emotion/react";
-import { Square, Circle } from "./shapes";
+import { Square, Circle } from "../shapes/core";
 
 import PropTypes from "prop-types";
-import CanvasHandler from "./CanvasHandler";
-import Shape from "./Shape";
+import Shape from "../shapes/Shape";
+import ShapeManager from "../shapes/ShapeManager";
+import ShapeDomManager from "../shapes/ShapeDomManager";
+
+let shapeDomManager = null;
 
 function Canvas({shape}) {
   const [ shapeList, setShapeList ] = useState([]);
   const canvasRef = useRef();
-  const canvasHandler = new CanvasHandler();
+  const shapeManager = new ShapeManager();
+
+  useEffect(() => {
+    if(shape) {
+      shapeManager.setShape(shape);      
+    }
+  }, [shape])
 
   const handleMouseDown = (e) => {
     if(canvasRef && shape) {
-      canvasHandler.removeElementDom();
-      canvasHandler.setDragState(true);
+      shapeManager.setDragState(true);
       
       shape.init(e.clientX, e.clientY);
-      const shapeElement = canvasHandler.getElementDom(shape);
+      shapeDomManager = new ShapeDomManager(shape);
+      const shapeElement = shapeDomManager.getElement();
 
       if(shapeElement) {
         canvasRef.current.appendChild(shapeElement);
@@ -27,22 +36,30 @@ function Canvas({shape}) {
   }
 
   const handleMouseUp = () => {
-    canvasHandler.setDragState(false);
+    shapeManager.setDragState(false);
     
-    if(canvasHandler.getShape()) {
+    if(shapeManager.getShape()) {
       setShapeList([...shapeList, (
-        <Shape 
-          style={canvasHandler.getShape().getShapeInfo()}
+        <Shape
+          key={shapeManager.getShape().getId()}
+          id={shapeManager.getShape().getId()}
+          style={shapeManager.getShape().getShapeInfo()}
         />
       )])
     }
     
-    canvasHandler.removeElementDom();
+    shapeDomManager.removeElement();
   }
 
   const handleMouseMove = (e) => {
     if(e) {
-      canvasHandler.moveElementDom(e.clientX, e.clientY);
+      const updateSize = shapeManager.updateShapeSize(e.clientX, e.clientY);
+      if(updateSize) {
+        const { width, height, left, top } = updateSize;
+
+        console.log(width, height)
+        shapeDomManager.updateElementSize(width, height, left, top);
+      }      
     }    
   }
 

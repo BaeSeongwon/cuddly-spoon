@@ -11,7 +11,8 @@ describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)
   let getByTestId, canvasDiv, tempDiv;
 
   beforeEach(async () => {
-    ({ getByTestId } = render(<Canvas shape={Square} />));
+    const shape = new Square();
+    ({ getByTestId } = render(<Canvas shape={shape} />));
     canvasDiv = getByTestId("canvas");
     fireEvent.mouseDown(canvasDiv);
 

@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { useEffect, useState } from "react";
 import { css } from "@emotion/react";
-import { Circle, Square } from "../canvas/shapes";
+import { Circle, Square } from "../shapes/core";
 
 import PropTypes from "prop-types";
 import ControllerButton from "./ControllerButton";
