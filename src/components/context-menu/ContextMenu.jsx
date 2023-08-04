@@ -5,23 +5,18 @@ import PropTypes from "prop-types";
 
 function ContextMenu({children}) {
   const [ visible, setVisible ] = useState(false);
-  const [ coordinate, setCoordinate ] = useState(false);
   
   const handleContextMenu = (e) => {
+    e.preventDefault();
+
     if(visible) {
       setVisible(false);
 
-      console.log(e)
-      setCoordinate({
-        left: e.clientX,
-        top: e.clientY
-      });
-
       setTimeout(() => {
-        setVisible(true);
+        setVisible({left: e.clientX, top: e.clientY});
       }, 100)
     } else {
-      setVisible(true);
+      setVisible({left: e.clientX, top: e.clientY});
     }
   }
 
@@ -29,12 +24,10 @@ function ContextMenu({children}) {
     setVisible(false);
   }
 
-  const getCoordinateValue = (type, defaultValue) => {
-    if(coordinate && coordinate[type]) {
-      return `${coordinate[type]}px`;
-    } else {
-      return defaultValue;
-    }
+  const handleClickMenu = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    alert('???')
   }
 
   return (
@@ -47,17 +40,34 @@ function ContextMenu({children}) {
         data-testid='context-menu'
         css={css({
           display: visible ? 'block' : 'none',
-          width: '300px',
           border: '1px solid black',
           position: 'absolute',
-          left: getCoordinateValue('left', 0),
-          top: getCoordinateValue('top', 0)
+          backgroundColor: 'white',
+          left: visible ? visible.left : 0,
+          top: visible ? visible.top : 0
         })}
       >
-        <ul>
-          <li>삭제하기</li>
-          <li>맨 뒤로 보내기</li>
-          <li>맨 앞으로 보내기</li>
+        <ul
+          css={css({
+            listStyle: 'none',
+            padding: '0px',
+            margin: '0px'
+          })}
+        >
+          <li
+            css={css`
+              padding: 5px;
+              cursor: pointer;
+
+              &:hover {
+                background-color: gray;
+                color: white;
+              }
+            `}
+            onClick={handleClickMenu}
+          >
+            <span>삭제하기</span>
+          </li>
         </ul>
       </div>
     </div>

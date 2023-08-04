@@ -14,6 +14,7 @@ function Canvas({shape}) {
   const [ shapeList, setShapeList ] = useState([]);
   const canvasRef = useRef();
   const shapeManager = new ShapeManager();
+  const LEFT_BUTTON_TYPE = 0;
 
   useEffect(() => {
     if(shape) {
@@ -22,7 +23,7 @@ function Canvas({shape}) {
   }, [shape])
 
   const handleMouseDown = (e) => {
-    if(canvasRef && shape) {
+    if(canvasRef && shape && e.button === LEFT_BUTTON_TYPE) {
       shapeManager.setDragState(true);
       
       shape.init(e.clientX, e.clientY);
@@ -35,29 +36,30 @@ function Canvas({shape}) {
     }    
   }
 
-  const handleMouseUp = () => {
-    shapeManager.setDragState(false);
+  const handleMouseUp = (e) => {
+    if(e.button === LEFT_BUTTON_TYPE) {
+      shapeManager.setDragState(false);
     
-    if(shapeManager.getShape()) {
-      setShapeList([...shapeList, (
-        <Shape
-          key={shapeManager.getShape().getId()}
-          id={shapeManager.getShape().getId()}
-          style={shapeManager.getShape().getShapeInfo()}
-        />
-      )])
-    }
-    
-    shapeDomManager.removeElement();
+      if(shapeManager.getShape()) {
+        setShapeList([...shapeList, (
+          <Shape
+            key={shapeManager.getShape().getId()}
+            id={shapeManager.getShape().getId()}
+            style={shapeManager.getShape().getShapeInfo()}
+          />
+        )])
+      }
+      
+      shapeDomManager.removeElement();
+    }    
   }
 
   const handleMouseMove = (e) => {
-    if(e) {
+    if(e && e.button === LEFT_BUTTON_TYPE) {
       const updateSize = shapeManager.updateShapeSize(e.clientX, e.clientY);
       if(updateSize) {
         const { width, height, left, top } = updateSize;
 
-        console.log(width, height)
         shapeDomManager.updateElementSize(width, height, left, top);
       }      
     }    

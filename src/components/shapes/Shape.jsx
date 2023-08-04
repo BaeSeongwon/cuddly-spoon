@@ -3,13 +3,15 @@ import { useState, useEffect } from "react";
 import { css } from "@emotion/react";
 
 import PropTypes from "prop-types";
+import ContextMenu from "../context-menu/ContextMenu";
 
 let isDrag = false;
 let initLeft = null;
 let initTop = null;
 
 function Shape({id, style}) {
-  const [ coordinates, setCoordinates ] = useState(null)
+  const [ coordinates, setCoordinates ] = useState(null);
+  const LEFT_BUTTON_TYPE = 0;
 
   useEffect(() => {
     if(style) {
@@ -30,14 +32,14 @@ function Shape({id, style}) {
 
   const handleMouseDown = (e) => {
     // 상위 컴포넌트로 이벤트 버블링을 차단한다.
-    if(e) {
+    if(e && e.button === LEFT_BUTTON_TYPE) {
       e.stopPropagation();
       isDrag = true;
     }
   }
 
   const handleMouseMove = (e) => {
-    if(e) {
+    if(e && e.button === LEFT_BUTTON_TYPE) {
       if(isDrag) {
         if(!initLeft && !initTop) {
           initLeft = e.clientX - coordinates.left;
@@ -53,7 +55,7 @@ function Shape({id, style}) {
   }
 
   const handleMouseUp = (e) => {
-    if(e) {
+    if(e && e.button === LEFT_BUTTON_TYPE) {
       e.stopPropagation();
       isDrag = false;
     }
@@ -61,21 +63,24 @@ function Shape({id, style}) {
 
   return (
     coordinates && (
-      <div
-        data-testid="shape"
-        css={css({
-          width: style.width,
-          height: style.height,
-          border: style.border,
-          borderRadius: style.borderRadius,
-          position: style.position,
-          left: `${coordinates.left}px`,
-          top: `${coordinates.top}px`
-        })}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-      />
+      <ContextMenu>
+        <div
+          data-testid="shape"
+          css={css({
+            width: style.width,
+            height: style.height,
+            border: style.border,
+            borderRadius: style.borderRadius,
+            position: style.position,
+            left: `${coordinates.left}px`,
+            top: `${coordinates.top}px`
+          })}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+        />
+      </ContextMenu>
+      
     )
   )
 }
