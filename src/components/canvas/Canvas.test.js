@@ -1,16 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { matchers } from "@emotion/jest";
-import { Circle, Square } from './shapes';
+import { Circle, Square } from '../shapes/core';
 
 import Canvas from "./Canvas";
-
-// emotion matchers 추가
-expect.extend(matchers);
 
 describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)를 차례대로 실행시 정상 동작 하는가?", () => {
   let getByTestId, canvasDiv, tempDiv;
 
-  beforeEach(async () => {
+  beforeEach(() => {
     const shape = new Square();
     ({ getByTestId } = render(<Canvas shape={shape} />));
     canvasDiv = getByTestId("canvas");
