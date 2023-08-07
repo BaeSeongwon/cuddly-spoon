@@ -1,9 +1,10 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { css } from "@emotion/react";
+import { ShapeCanvasContext } from "../ShapeCanvasProvider";
 
 import PropTypes from "prop-types";
-import ContextMenu from "../context-menu/ContextMenu";
+import ShapeContextMenu from "../ShapeContextMenu";
 
 let isDrag = false;
 let initLeft = null;
@@ -11,6 +12,8 @@ let initTop = null;
 
 function Shape({id, style}) {
   const [ coordinates, setCoordinates ] = useState(null);
+  const { setSelectedShapeId, canvasBoundary } = useContext(ShapeCanvasContext);
+  const ref = useRef();
   const LEFT_BUTTON_TYPE = 0;
 
   useEffect(() => {
@@ -26,46 +29,63 @@ function Shape({id, style}) {
         top = parseInt(style.top);
       }
 
-      setCoordinates({left: left, top: top});
+      setCoordinates({left: left, top: top});      
     }
   }, []);
 
   const handleMouseDown = (e) => {
     // 상위 컴포넌트로 이벤트 버블링을 차단한다.
-    if(e && e.button === LEFT_BUTTON_TYPE) {
-      e.stopPropagation();
+    e.stopPropagation();
+
+    if(e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === id) {
       isDrag = true;
+      document.addEventListener('mouseup',handleMouseUp);
     }
   }
 
   const handleMouseMove = (e) => {
-    if(e && e.button === LEFT_BUTTON_TYPE) {
+    e.stopPropagation();
+
+    if(e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === id) {
       if(isDrag) {
         if(!initLeft && !initTop) {
           initLeft = e.clientX - coordinates.left;
           initTop = e.clientY - coordinates.top;
         } else {
-          setCoordinates({
-            left: e.clientX - initLeft,
-            top: e.clientY - initTop
-          })
+          const { left, right, top, bottom } = canvasBoundary;
+          
+          let newLeft = e.clientX - initLeft;
+          newLeft = newLeft >= left ? newLeft : left;
+          newLeft = (newLeft + parseInt(style.width)) <= right ? newLeft : (right - parseInt(style.width) - 2);
+
+          let newTop = e.clientY - initTop;
+          newTop = newTop >= top ? newTop : top;
+          newTop = (newTop + parseInt(style.height)) <= bottom ? newTop : (bottom - parseInt(style.height) - 2);
+
+          setCoordinates({ left: newLeft, top: newTop });
         }
       }
     }
   }
 
   const handleMouseUp = (e) => {
-    if(e && e.button === LEFT_BUTTON_TYPE) {
-      e.stopPropagation();
-      isDrag = false;
+    e.stopPropagation();
+    isDrag = false;
+  }
+
+  const handleContextMenu = (e) => {
+    if(id) {
+      setSelectedShapeId(id);
     }
   }
 
   return (
     coordinates && (
-      <ContextMenu>
+      <ShapeContextMenu>
         <div
+          ref={ref}
           data-testid="shape"
+          data-shapeid={id}
           css={css({
             width: style.width,
             height: style.height,
@@ -73,13 +93,15 @@ function Shape({id, style}) {
             borderRadius: style.borderRadius,
             position: style.position,
             left: `${coordinates.left}px`,
-            top: `${coordinates.top}px`
+            top: `${coordinates.top}px`,
+            backgroundColor: 'white'
           })}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
+          onContextMenu={handleContextMenu}
         />
-      </ContextMenu>
+      </ShapeContextMenu>
       
     )
   )

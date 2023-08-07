@@ -1,4 +1,4 @@
-import SSCButton from "../ui/button/SSCButton";
+import SSCButton from "../../ui/button/SSCButton";
 
 import PropTypes from "prop-types";
 

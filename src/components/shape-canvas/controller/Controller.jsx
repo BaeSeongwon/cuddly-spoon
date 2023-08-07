@@ -1,40 +1,24 @@
 /** @jsxImportSource @emotion/react */
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { css } from "@emotion/react";
-import { Circle, Square } from "../shapes/core";
+import { ShapeCanvasContext } from "../ShapeCanvasProvider";
 
 import PropTypes from "prop-types";
 import ControllerButton from "./ControllerButton";
 
-function Controller({initActiveButton, onChangeShape, onClearCanvas}) {
-  const [ activeButton, setActiveButton ] = useState(null);
+function Controller() {
+  const { selectedShapeType, setSelectedShapeType, onClearDrawnShapeList } = useContext(ShapeCanvasContext);
   const button_container = css({
     display: 'inline-block',
     margin: '0px 5px'
   });
 
-  useEffect(() => {
-    if(initActiveButton) {
-      handleChangeShape(initActiveButton);
-    }
-  }, []);
-
   const getActive = (type) => {
-    if(type && activeButton === type) {
+    if(type && selectedShapeType === type) {
       return true;
     } else {
       return false;
     }
-  }
-
-  const handleChangeShape = (shape) => {
-    setActiveButton(shape);
-
-    if(shape === "box") {
-      onChangeShape(new Square());
-    } else if(shape === "circle") {
-      onChangeShape(new Circle());
-    }    
   }
 
   return (
@@ -43,20 +27,20 @@ function Controller({initActiveButton, onChangeShape, onClearCanvas}) {
         <ControllerButton 
           label="Box"
           active={getActive("box")}
-          onClick={() => handleChangeShape("box")}
+          onClick={() => setSelectedShapeType("box")}
         />
       </div>
       <div css={button_container}>
         <ControllerButton 
           label="Circle"
           active={getActive("circle")}
-          onClick={() => handleChangeShape("circle")}
+          onClick={() => setSelectedShapeType("circle")}
         />
       </div>
       <div css={button_container}>
         <ControllerButton 
           label='Clear' 
-          onClick={onClearCanvas}
+          onClick={onClearDrawnShapeList}
         />
       </div>
     </div>

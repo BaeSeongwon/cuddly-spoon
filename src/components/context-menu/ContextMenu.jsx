@@ -3,7 +3,7 @@ import { useState } from "react";
 import { css } from "@emotion/react";
 import PropTypes from "prop-types";
 
-function ContextMenu({children}) {
+function ContextMenu({children, list}) {
   const [ visible, setVisible ] = useState(false);
   
   const handleContextMenu = (e) => {
@@ -22,12 +22,6 @@ function ContextMenu({children}) {
 
   const handleClick = () => {
     setVisible(false);
-  }
-
-  const handleClickMenu = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    alert('???')
   }
 
   return (
@@ -54,20 +48,25 @@ function ContextMenu({children}) {
             margin: '0px'
           })}
         >
-          <li
-            css={css`
+          {list.map(({label, handler}, index) => (
+            <li
+              key={index}
+              css={css`
               padding: 5px;
-              cursor: pointer;
+                cursor: pointer;
 
-              &:hover {
-                background-color: gray;
-                color: white;
-              }
-            `}
-            onClick={handleClickMenu}
-          >
-            <span>삭제하기</span>
-          </li>
+                &:hover {
+                  background-color: gray;
+                  color: white;
+                }
+              `}
+              onClick={handler}
+              onMouseDown={(e) => e.stopPropagation()}
+              onMouseUp={(e) => e.stopPropagation()}
+            >
+              <span>{label}</span>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
@@ -75,7 +74,12 @@ function ContextMenu({children}) {
 }
 
 ContextMenu.propTypes = {
-  children: PropTypes.element.isRequired
+  children: PropTypes.element.isRequired,
+  list: PropTypes.array.isRequired
+}
+
+ContextMenu.defaultProps = {
+  list: []
 }
 
 export default ContextMenu;

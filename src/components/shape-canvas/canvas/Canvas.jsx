@@ -1,33 +1,46 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useRef, Fragment, useEffect } from "react";
+import { useRef, Fragment, useEffect, useContext } from "react";
 import { css } from "@emotion/react";
 import { Square, Circle } from "../shapes/core";
+import { ShapeCanvasContext } from "../ShapeCanvasProvider";
 
 import PropTypes from "prop-types";
 import Shape from "../shapes/Shape";
 import ShapeManager from "../shapes/ShapeManager";
 import ShapeDomManager from "../shapes/ShapeDomManager";
+import ShapeFactory from "../shapes/ShapeFactory";
 
 let shapeDomManager = null;
 
-function Canvas({shape}) {
-  const [ shapeList, setShapeList ] = useState([]);
+function Canvas() {
+  const { 
+    selectedShapeType, 
+    drawnShapeList, 
+    setDrawnShapeList, 
+    setCanvasBoundary,
+    getShapeZindex
+  } = useContext(ShapeCanvasContext);
+  
   const canvasRef = useRef();
   const shapeManager = new ShapeManager();
+  const shapeFactory = new ShapeFactory();
   const LEFT_BUTTON_TYPE = 0;
 
   useEffect(() => {
-    if(shape) {
-      shapeManager.setShape(shape);      
-    }
-  }, [shape])
+    if(canvasRef) {
+      const { left, top, right, bottom } = canvasRef.current.getBoundingClientRect();
+
+      setCanvasBoundary({left, right, top, bottom});
+    }    
+  }, [canvasRef])
 
   const handleMouseDown = (e) => {
-    if(canvasRef && shape && e.button === LEFT_BUTTON_TYPE) {
+    if(canvasRef && selectedShapeType && e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === null) {
+      shapeManager.setShape(shapeFactory.createShape(selectedShapeType));
       shapeManager.setDragState(true);
-      
-      shape.init(e.clientX, e.clientY);
-      shapeDomManager = new ShapeDomManager(shape);
+      shapeManager.getShape().init(e.clientX, e.clientY, getShapeZindex());
+      shapeDomManager = new ShapeDomManager(shapeManager.getShape());
+
       const shapeElement = shapeDomManager.getElement();
 
       if(shapeElement) {
@@ -37,17 +50,11 @@ function Canvas({shape}) {
   }
 
   const handleMouseUp = (e) => {
-    if(e.button === LEFT_BUTTON_TYPE) {
+    if(e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === null) {
       shapeManager.setDragState(false);
     
       if(shapeManager.getShape()) {
-        setShapeList([...shapeList, (
-          <Shape
-            key={shapeManager.getShape().getId()}
-            id={shapeManager.getShape().getId()}
-            style={shapeManager.getShape().getShapeInfo()}
-          />
-        )])
+        setDrawnShapeList(drawnShapeList.concat(shapeManager.getShape()));
       }
       
       shapeDomManager.removeElement();
@@ -55,7 +62,7 @@ function Canvas({shape}) {
   }
 
   const handleMouseMove = (e) => {
-    if(e && e.button === LEFT_BUTTON_TYPE) {
+    if(e && e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === null) {
       const updateSize = shapeManager.updateShapeSize(e.clientX, e.clientY);
       if(updateSize) {
         const { width, height, left, top } = updateSize;
@@ -78,8 +85,12 @@ function Canvas({shape}) {
       onMouseUp={handleMouseUp}
       onMouseMove={handleMouseMove}
     >
-      {shapeList.map((shape, index) => (
-        <Fragment key={index}>{shape}</Fragment>
+      {drawnShapeList.map((shape) => (
+        <Shape 
+          key={shape.getId()}
+          id={shape.getId()}
+          style={shape.getShapeInfo()}
+        />
       ))}
     </div>
   )

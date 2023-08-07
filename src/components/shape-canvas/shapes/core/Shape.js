@@ -10,6 +10,7 @@ class Shape {
   #position;
   #initLeft;
   #initTop;
+  #zIndex;
 
   constructor(left, top) {
     left = left ? left : 0;
@@ -26,17 +27,18 @@ class Shape {
     this.#initTop = top;
   }
 
-  init(left, top) {
+  init(left, top, zIndex) {
     this.#left = `${left}px`;
     this.#top = `${top}px`;
     this.#initLeft = left;
     this.#initTop = top;
     this.#width = '5px';
     this.#height = '5px';
+    this.#zIndex = zIndex;
   }
 
   getId() {
-    return this.id;
+    return this.#id;
   }
 
   getShapeInfo() {
@@ -47,8 +49,13 @@ class Shape {
       position: this.#position,
       left: this.#left,
       top: this.#top,
-      borderRadius: this.borderRadius
+      borderRadius: this.borderRadius,
+      zIndex: this.#zIndex
     }
+  }
+
+  setShapeInfo() {
+
   }
 
   getInitLeft() {
@@ -90,19 +97,6 @@ class Shape {
   setLeft(left) {
     this.#left = left;
   }
-
-  // updateShapeSize(left, top) {
-  //   this.#width = `${Math.abs(this.#initLeft - parseInt(left))}px`;
-  //   this.#height = `${Math.abs(this.#initTop - parseInt(top))}px`;
-     
-  //   if(this.initLeft - parseInt(left) > 0) {
-  //     this.#left = `${left}px`;  
-  //   }
-
-  //   if(this.initTop - parseInt(top) > 0) {
-  //     this.#top = `${top}px`;
-  //   }
-  // }
 }
 
 export default Shape;

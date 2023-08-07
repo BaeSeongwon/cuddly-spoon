@@ -1,14 +1,17 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { Circle, Square } from '../shapes/core';
 
 import Canvas from "./Canvas";
+import ShapeCanvasProvider from "../ShapeCanvasProvider";
 
 describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)를 차례대로 실행시 정상 동작 하는가?", () => {
   let getByTestId, canvasDiv, tempDiv;
 
   beforeEach(() => {
-    const shape = new Square();
-    ({ getByTestId } = render(<Canvas shape={shape} />));
+    ({ getByTestId } = render(
+      <ShapeCanvasProvider>
+        <Canvas />
+      </ShapeCanvasProvider>
+    ));
     canvasDiv = getByTestId("canvas");
     fireEvent.mouseDown(canvasDiv);
 
