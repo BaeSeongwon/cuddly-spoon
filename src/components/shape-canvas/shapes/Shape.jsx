@@ -1,7 +1,8 @@
 /** @jsxImportSource @emotion/react */
-import { useState, useEffect, useContext, useRef } from "react";
+import { useContext, useRef, useLayoutEffect } from "react";
 import { css } from "@emotion/react";
 import { ShapeCanvasContext } from "../ShapeCanvasProvider";
+import { LEFT_BUTTON_TYPE } from "../config";
 
 import PropTypes from "prop-types";
 import ShapeContextMenu from "../ShapeContextMenu";
@@ -10,100 +11,102 @@ let isDrag = false;
 let initLeft = null;
 let initTop = null;
 
-function Shape({id, style}) {
-  const [ coordinates, setCoordinates ] = useState(null);
-  const { setSelectedShapeId, canvasBoundary } = useContext(ShapeCanvasContext);
+function Shape(props) {
+  const { setSelectedShapeId, canvasBoundary, getMostTopZindex } = useContext(ShapeCanvasContext);
   const ref = useRef();
-  const LEFT_BUTTON_TYPE = 0;
 
-  useEffect(() => {
-    if(style) {
+  useLayoutEffect(() => {
+    if(ref && ref.current) {
       let left = 0;
       let top = 0;
 
-      if(style.hasOwnProperty('left') && style.left !== null) {
-        left = parseInt(style.left);
+      if(props.left) {
+        left = parseInt(props.left);
       }
 
-      if(style.hasOwnProperty('top') && style.top !== null) {
-        top = parseInt(style.top);
+      if(props.top) {
+        top = parseInt(props.top);
       }
 
-      setCoordinates({left: left, top: top});      
+      ref.current.style.left = `${left}px`;
+      ref.current.style.top = `${top}px`;
+
+      if(props.zIndex) {
+        ref.current.style.zIndex = `${props.zIndex}`;
+      }      
     }
-  }, []);
+  }, [ref])
 
   const handleMouseDown = (e) => {
-    // 상위 컴포넌트로 이벤트 버블링을 차단한다.
     e.stopPropagation();
 
-    if(e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === id) {
+    if(e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === props.id) {
       isDrag = true;
-      document.addEventListener('mouseup',handleMouseUp);
+      initLeft = e.clientX - parseInt(ref.current.style.left);
+      initTop = e.clientY - parseInt(ref.current.style.top);
+
+      ref.current.style.zIndex = getMostTopZindex();
+      props.canvasRef.current.addEventListener("mousemove", handleMouseMove);
+      props.canvasRef.current.addEventListener("mouseup", handleMouseUp);
     }
   }
 
   const handleMouseMove = (e) => {
     e.stopPropagation();
 
-    if(e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === id) {
-      if(isDrag) {
-        if(!initLeft && !initTop) {
-          initLeft = e.clientX - coordinates.left;
-          initTop = e.clientY - coordinates.top;
-        } else {
-          const { left, right, top, bottom } = canvasBoundary;
-          
-          let newLeft = e.clientX - initLeft;
-          newLeft = newLeft >= left ? newLeft : left;
-          newLeft = (newLeft + parseInt(style.width)) <= right ? newLeft : (right - parseInt(style.width) - 2);
-
-          let newTop = e.clientY - initTop;
-          newTop = newTop >= top ? newTop : top;
-          newTop = (newTop + parseInt(style.height)) <= bottom ? newTop : (bottom - parseInt(style.height) - 2);
-
-          setCoordinates({ left: newLeft, top: newTop });
-        }
-      }
+    if(isDrag && ref && ref.current) {
+      const { left, right, top, bottom } = canvasBoundary;
+        
+      let newLeft = e.clientX - initLeft;
+      newLeft = newLeft >= left ? newLeft : left;
+      newLeft = (newLeft + parseInt(props.width)) <= right ? newLeft : (right - parseInt(props.width) - 2);
+  
+      let newTop = e.clientY - initTop;
+      newTop = newTop >= top ? newTop : top;
+      newTop = (newTop + parseInt(props.height)) <= bottom ? newTop : (bottom - parseInt(props.height) - 2);
+  
+      ref.current.style.left = `${newLeft}px`;
+      ref.current.style.top = `${newTop}px`;
     }
   }
 
   const handleMouseUp = (e) => {
     e.stopPropagation();
     isDrag = false;
+    if(ref && ref.current) {
+      ref.current.style.zIndex = `${props.zIndex}`;
+      props.onChangeShapeLocation(props.id, ref.current.style.left, ref.current.style.top);
+    }
+
+    document.removeEventListener("mouseup", handleMouseUp);
+    props.canvasRef.current.removeEventListener("mousemove", handleMouseMove);
+    props.canvasRef.current.removeEventListener("mouseup", handleMouseUp);
   }
 
-  const handleContextMenu = (e) => {
-    if(id) {
-      setSelectedShapeId(id);
+  const handleContextMenu = () => {
+    if(props.id) {
+      setSelectedShapeId(props.id);
     }
   }
 
   return (
-    coordinates && (
-      <ShapeContextMenu>
-        <div
-          ref={ref}
-          data-testid="shape"
-          data-shapeid={id}
-          css={css({
-            width: style.width,
-            height: style.height,
-            border: style.border,
-            borderRadius: style.borderRadius,
-            position: style.position,
-            left: `${coordinates.left}px`,
-            top: `${coordinates.top}px`,
-            backgroundColor: 'white'
-          })}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onContextMenu={handleContextMenu}
-        />
-      </ShapeContextMenu>
-      
-    )
+    <ShapeContextMenu>
+      <div
+        ref={ref}
+        data-testid="shape"
+        data-shapeid={props.id}
+        css={css(`
+          width: ${props.width};
+          height: ${props.height};
+          border: ${props.border};
+          border-radius: ${props.borderRadius};
+          position: ${props.position};
+          background-color: white;
+        `)}
+        onMouseDown={handleMouseDown}
+        onContextMenu={handleContextMenu}
+      />
+    </ShapeContextMenu>
   )
 }
 
@@ -112,28 +115,35 @@ Shape.propTypes = {
     PropTypes.string.isRequired,
     PropTypes.oneOf([null]).isRequired
   ]),
-  style: PropTypes.shape({
-    width: PropTypes.string,
-    height: PropTypes.string,
-    border: PropTypes.string,
-    borderRadius: PropTypes.string,
-    position: PropTypes.string,
-    left: PropTypes.string,
-    top: PropTypes.string
-  })
+  canvasRef: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({ current: PropTypes.instanceOf(Element) })
+  ]),
+  width: PropTypes.string,
+  height: PropTypes.string,
+  border: PropTypes.string,
+  borderRadius: PropTypes.string,
+  position: PropTypes.string,
+  left: PropTypes.string,
+  top: PropTypes.string,
+  zIndex: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number
+  ]),
+  onChangeShapeLocation: PropTypes.func
 }
 
 Shape.defaultProps = {
   id: null,
-  style: {
-    width: '10px',
-    height: '10px',
-    border: '1px solid black',
-    borderRadius: '1px',
-    position: 'absolute',
-    left: '0px',
-    top: '0px'
-  }
+  width: '10px',
+  height: '10px',
+  border: '1px solid black',
+  borderRadius: '1px',
+  position: 'absolute',
+  left: '0px',
+  top: '0px',
+  zIndex: 'auto',
+  onChangeShapeLocation: () => {}
 }
 
 export default Shape;

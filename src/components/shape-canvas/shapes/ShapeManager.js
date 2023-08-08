@@ -26,6 +26,10 @@ class ShapeManager {
     }
   }
 
+  getDragState() {
+    return this.#isDragState;
+  }
+
   updateShapeSize(left, top) {
     if(this.#isDragState && this.#shape) {
       this.#shape.setWidth(`${Math.abs(this.#shape.getInitLeft() - parseInt(left))}px`);
@@ -39,11 +43,16 @@ class ShapeManager {
         this.#shape.setTop(`${top}px`);
       }
 
+      if(this.#shape.getType() === "circle") {
+        this.#shape.setBorderRadius(`${this.#shape.getWidth()} / ${this.#shape.getHeight()}`);
+      }
+
       return {
         width: this.#shape.getWidth(),
         height: this.#shape.getHeight(),
         left: this.#shape.getLeft(),
-        top: this.#shape.getTop()
+        top: this.#shape.getTop(),
+        borderRadius: this.#shape.getBorderRadius()
       }
     } else {
       return null;

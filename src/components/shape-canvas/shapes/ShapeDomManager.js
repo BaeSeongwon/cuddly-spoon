@@ -31,7 +31,6 @@ class ShapeDomManager {
       this.#element.style.height = height;
       this.#element.style.left = left;
       this.#element.style.top = top;
-      console.log(borderRadius);
       this.#element.style.borderRadius = borderRadius;
     }
   }

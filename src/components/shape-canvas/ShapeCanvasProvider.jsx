@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext } from "react";
 import { LocalStorage } from "../../utils/web-storage";
 import { Square, Circle } from "./shapes/core";
-import { STORAGE_SAVE_KEY } from "./config";
+import { STORAGE_SAVE_KEY, DEFAULT_SELECTED_SHAPE } from "./config";
 
 export const ShapeCanvasContext = createContext({
   selectedShapeType: "box",
@@ -13,11 +13,12 @@ export const ShapeCanvasContext = createContext({
   setSelectedShapeId: () => {},
   canvasBoundary: null,
   setCanvasBoundary: () => {},
-  getShapeZindex: () => {}
+  getShapeZindex: () => {},
+  getMostTopZindex: () => {}
 });
 
 export default function ShapeCanvasProvider({children}) {
-  const [ selectedShapeType, setSelectedShapeType ] = useState("box");
+  const [ selectedShapeType, setSelectedShapeType ] = useState(DEFAULT_SELECTED_SHAPE);
   const [ drawnShapeList, _setDrawnShapeList ] = useState([]);
   const [ selectedShapeId, setSelectedShapeId ] = useState(null);
   const [ shapeZindex, setShapeZindex ] = useState(0);
@@ -47,6 +48,22 @@ export default function ShapeCanvasProvider({children}) {
     }
   }, []);
 
+  useEffect(() => {
+    if(drawnShapeList.length > 0) {
+      const findMostTopZindexValue = drawnShapeList.reduce((acc, shape) => {
+        if(shape.getZindex() > acc) {
+          acc = shape.getZindex();
+        }
+
+        return acc;
+      }, 0);
+
+      if(findMostTopZindexValue > 0) {
+        setShapeZindex(findMostTopZindexValue + 1);
+      }
+    }
+  }, [drawnShapeList])
+
   const onClearDrawnShapeList = () => {
     LocalStorage.remove(STORAGE_SAVE_KEY);
     _setDrawnShapeList([]);
@@ -67,6 +84,10 @@ export default function ShapeCanvasProvider({children}) {
     }
   }
 
+  const getMostTopZindex = () => {
+    return shapeZindex + 1;
+  }
+
   return (
     <ShapeCanvasContext.Provider 
       value={{
@@ -79,7 +100,8 @@ export default function ShapeCanvasProvider({children}) {
         setSelectedShapeId,
         canvasBoundary,
         setCanvasBoundary,
-        getShapeZindex
+        getShapeZindex,
+        getMostTopZindex
       }}
     >
       {children}

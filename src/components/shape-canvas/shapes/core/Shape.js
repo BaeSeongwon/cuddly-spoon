@@ -11,8 +11,9 @@ class Shape {
   #initLeft;
   #initTop;
   #zIndex;
+  #borderRadius;
 
-  constructor(left, top) {
+  constructor(left, top, borderRadius) {
     left = left ? left : 0;
     top = top ? top : 0;
 
@@ -25,6 +26,7 @@ class Shape {
     this.#top = `${top}px`;
     this.#initLeft = left;
     this.#initTop = top;
+    this.#borderRadius = borderRadius;
   }
 
   init(left, top, zIndex) {
@@ -49,7 +51,7 @@ class Shape {
       position: this.#position,
       left: this.#left,
       top: this.#top,
-      borderRadius: this.borderRadius,
+      borderRadius: this.#borderRadius,
       zIndex: this.#zIndex
     }
   }
@@ -64,7 +66,7 @@ class Shape {
     this.#zIndex = zIndex;
     this.#border = border;
     this.#position = position;
-    this.borderRadius = borderRadius;
+    this.#borderRadius = borderRadius;
   }
 
   toJson() {
@@ -76,7 +78,7 @@ class Shape {
       position: this.#position,
       left: this.#left,
       top: this.#top,
-      borderRadius: this.borderRadius,
+      borderRadius: this.#borderRadius,
       initLeft: this.#initLeft,
       initTop: this.#initTop,
       zIndex: this.#zIndex
@@ -107,6 +109,22 @@ class Shape {
     return this.#height;
   }
 
+  getBorder() {
+    return this.#border;
+  }
+
+  getBorderRadius() {
+    return this.#borderRadius;
+  }
+
+  getPosition() {
+    return this.#position;
+  }
+
+  getZindex() {
+    return this.#zIndex;
+  }
+
   setWidth(width) {
     this.#width = width;
   }
@@ -121,6 +139,10 @@ class Shape {
 
   setLeft(left) {
     this.#left = left;
+  }
+
+  setBorderRadius(radius) {
+    this.#borderRadius = radius;
   }
 }
 

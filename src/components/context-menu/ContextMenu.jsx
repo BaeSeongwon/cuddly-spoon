@@ -38,7 +38,8 @@ function ContextMenu({children, list}) {
           position: 'absolute',
           backgroundColor: 'white',
           left: visible ? visible.left : 0,
-          top: visible ? visible.top : 0
+          top: visible ? visible.top : 0,
+          zIndex: 999999
         })}
       >
         <ul
