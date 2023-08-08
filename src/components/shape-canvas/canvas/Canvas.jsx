@@ -1,14 +1,16 @@
 /** @jsxImportSource @emotion/react */
-import { useRef, Fragment, useEffect, useContext } from "react";
+import { useRef, useEffect, useContext } from "react";
 import { css } from "@emotion/react";
 import { Square, Circle } from "../shapes/core";
 import { ShapeCanvasContext } from "../ShapeCanvasProvider";
+import { LocalStorage } from '../../../utils/web-storage';
 
 import PropTypes from "prop-types";
 import Shape from "../shapes/Shape";
 import ShapeManager from "../shapes/ShapeManager";
 import ShapeDomManager from "../shapes/ShapeDomManager";
 import ShapeFactory from "../shapes/ShapeFactory";
+
 
 let shapeDomManager = null;
 
@@ -67,7 +69,7 @@ function Canvas() {
       if(updateSize) {
         const { width, height, left, top } = updateSize;
 
-        shapeDomManager.updateElementSize(width, height, left, top);
+        shapeDomManager.updateElementSize(width, height, left, top, `${width}px / ${height}px`);
       }      
     }    
   }

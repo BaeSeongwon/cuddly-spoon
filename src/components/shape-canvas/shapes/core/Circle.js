@@ -4,7 +4,11 @@ class Circle extends Shape {
   #borderRadius;
   constructor(left, top) {
     super(left, top);
-    this.#borderRadius = '10px';
+    this.#borderRadius = `10px / 10px`
+  }
+
+  init(left, top, zIndex) {
+    super.init(left, top, zIndex);
   }
 
   getShapeInfo() {
@@ -14,9 +18,11 @@ class Circle extends Shape {
     }
   }
 
-  updateShapeSize(left, top) {
-    super.updateShapeSize(left, top);
-    this.#borderRadius = `${this.width} / ${this.height}`;
+  toJson() {
+    return {
+      ...super.toJson(),
+      type: "circle"
+    }
   }
 }
 

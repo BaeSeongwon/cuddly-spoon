@@ -54,8 +54,33 @@ class Shape {
     }
   }
 
-  setShapeInfo() {
+  setShapeInfo(width, height, border, position, left, top, borderRadius, zIndex) {
+    this.#left = left;
+    this.#top = top;
+    this.#initLeft = left;
+    this.#initTop = top;
+    this.#width = width;
+    this.#height = height;
+    this.#zIndex = zIndex;
+    this.#border = border;
+    this.#position = position;
+    this.borderRadius = borderRadius;
+  }
 
+  toJson() {
+    return {
+      id: this.#id,
+      width: this.#width,
+      height: this.#height,
+      border: this.#border,
+      position: this.#position,
+      left: this.#left,
+      top: this.#top,
+      borderRadius: this.borderRadius,
+      initLeft: this.#initLeft,
+      initTop: this.#initTop,
+      zIndex: this.#zIndex
+    }
   }
 
   getInitLeft() {
