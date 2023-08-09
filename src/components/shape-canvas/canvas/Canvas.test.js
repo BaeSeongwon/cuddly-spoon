@@ -13,7 +13,7 @@ describe("Canvas 컴포넌트 마우스 이벤트(MouseDown, MouseMove, MouseUp)
       </ShapeCanvasProvider>
     ));
     canvasDiv = getByTestId("canvas");
-    fireEvent.mouseDown(canvasDiv);
+    fireEvent.mouseDown(canvasDiv, {clientX: '100px', clientY: '100px'});
 
     tempDiv = Array.from(canvasDiv.childNodes).find(node => node.classList.contains("temp-div"));
     expect(tempDiv).toBeDefined();

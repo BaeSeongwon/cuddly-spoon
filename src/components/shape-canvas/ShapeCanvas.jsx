@@ -6,7 +6,6 @@ import Canvas from "./canvas/Canvas";
 import Controller from "./controller/Controller";
 
 function ShapeCanvas() {
-  
   return (
       <ShapeCanvasProvider>
         <div

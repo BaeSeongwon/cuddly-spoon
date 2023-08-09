@@ -11,7 +11,7 @@ class ShapeFactory {
 
   createShape(type) {
     if(type) {
-      if(type === "box") {
+      if(type === "square") {
         return new Square();
       } else if(type === "circle") {
         return new Circle();

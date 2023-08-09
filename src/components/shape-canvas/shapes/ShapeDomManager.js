@@ -1,4 +1,7 @@
 class ShapeDomManager {
+  /**
+   * @property 캔버스에 생성된 도형의 사이즈 조절시 생성되는 dom element 객체
+   */
   #element = null;
 
   constructor(shape) {

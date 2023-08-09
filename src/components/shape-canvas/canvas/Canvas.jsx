@@ -19,7 +19,7 @@ function Canvas() {
     drawnShapeList, 
     setDrawnShapeList, 
     setCanvasBoundary,
-    getShapeZindex
+    getMostTopZindexAndUpdate
   } = useContext(ShapeCanvasContext);
   
   const canvasRef = useRef();
@@ -37,7 +37,7 @@ function Canvas() {
     if(canvasRef && selectedShapeType && e.button === LEFT_BUTTON_TYPE && e.target.getAttribute("data-shapeid") === null) {
       shapeManager.setShape(shapeFactory.createShape(selectedShapeType));
       shapeManager.setDragState(true);
-      shapeManager.getShape().init(e.clientX, e.clientY, getShapeZindex());
+      shapeManager.getShape().init(e.clientX, e.clientY, getMostTopZindexAndUpdate());
       shapeDomManager = new ShapeDomManager(shapeManager.getShape());
 
       const shapeElement = shapeDomManager.getElement();

@@ -26,8 +26,8 @@ function Controller() {
       <div css={button_container}>
         <ControllerButton 
           label="Box"
-          active={getActive("box")}
-          onClick={() => setSelectedShapeType("box")}
+          active={getActive("square")}
+          onClick={() => setSelectedShapeType("square")}
         />
       </div>
       <div css={button_container}>

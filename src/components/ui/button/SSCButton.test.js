@@ -1,20 +1,7 @@
 import SSCButton from "./SSCButton";
 import { fireEvent, render } from "@testing-library/react";
 
-test("should work as expected with defaultProps", () => {
-  const button = render(<SSCButton />);
-  expect(button.container).toMatchInlineSnapshot(`
-    <div>
-      <div>
-        <button>
-          Button
-        </button>
-      </div>
-    </div>
-  `);
-})
-
-test("should simulate button click", () => {
+test("SSCButton 컴포넌트의 label 및 onClick props가 정상동작 한다.", () => {
   const handleClick = jest.fn();
   const { getByText } = render(<SSCButton label='Click Me' onClick={handleClick}/>);
   

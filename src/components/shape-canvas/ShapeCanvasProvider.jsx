@@ -3,8 +3,37 @@ import { LocalStorage } from "../../utils/web-storage";
 import { Square, Circle } from "./shapes/core";
 import { STORAGE_SAVE_KEY, DEFAULT_SELECTED_SHAPE } from "./config";
 
+/**
+ * Shape Canvas 컴포넌트의 Context API
+ * @property {string} selectedShapeType 캔버스에 그려질 도형
+ * @default "square"
+ * @property {array} drawnShapeList 캔버스에 그려진 도형 객체 배열
+ * @default []
+ * @property {string | null} selectedShapeId 캔버스에 그려진 도형의 컨텍스트 메뉴 호출시 선택된 도형의 아이디
+ * @default null
+ * @property {object | null} canvasBoundary 캔버스 테두리의 좌표값
+ * @default null
+ * @example {left: '10px', right: '10px', top: '10px', bottom: '10px'}
+ * @property {function} setSelectedShapeType selectedShapeType의 setter 함수
+ * @returns void
+ * @property {function} setDrawnShapeList drawnShapeList의 setter 함수
+ * @returns void
+ * @property {function} setSelectedShapeId selectedShapeId의 setter 함수
+ * @returns void
+ * @property {function} setCanvasBoundary canvasBoundary의 setter 함수
+ * @returns void
+ * @property {function} onClearDrawnShapeList 캔버스에 그려진 모든 도형 삭제 함수
+ * @returns void
+ * @property {function} getMostTopZindexAndUpdate 캔버스에 그려진 도형의 z-index 중 가장 큰 값에 1증가한 값을 state에 저장 및 조회하는 함수
+ * @returns number
+ * @property {function} getMostTopZindex 캔버스에 그려진 도형의 z-index 중 가장 큰 값에 1증가한 값을 조회하는 함수
+ * @return number
+ * @property {function} onChangeShapeOrderTop 맨 앞으로 보내기 함수
+ * @return void
+ * @property {function} onChangeShapeOrderTop 맨 뒤로 보내기 함수
+ */
 export const ShapeCanvasContext = createContext({
-  selectedShapeType: "box",
+  selectedShapeType: DEFAULT_SELECTED_SHAPE,
   setSelectedShapeType: () => {},
   drawnShapeList: [],
   setDrawnShapeList: () => {},
@@ -13,7 +42,7 @@ export const ShapeCanvasContext = createContext({
   setSelectedShapeId: () => {},
   canvasBoundary: null,
   setCanvasBoundary: () => {},
-  getShapeZindex: () => {},
+  getMostTopZindexAndUpdate: () => {},
   getMostTopZindex: () => {},
   onChangeShapeOrderTop: () => {}, 
   onChangeShapeOrderBottom: () => {}
@@ -79,16 +108,12 @@ export default function ShapeCanvasProvider({children}) {
    * @function z-index 제일 높은 값 가져오는 함수
    * @return number 
    */
-  const getShapeZindex = () => {
+  const getMostTopZindexAndUpdate = () => {
     setShapeZindex(shapeZindex + 1);
 
     return shapeZindex;
   }
 
-  /**
-   * @function 도형
-   * @param {*} shapeList 
-   */
   const setDrawnShapeList = (shapeList) => {
     if(shapeList) {
       const shapeJsonList = shapeList.map(item => item.toJson());
@@ -160,7 +185,7 @@ export default function ShapeCanvasProvider({children}) {
         setSelectedShapeId,
         canvasBoundary,
         setCanvasBoundary,
-        getShapeZindex,
+        getMostTopZindexAndUpdate,
         getMostTopZindex,
         onChangeShapeOrderTop,
         onChangeShapeOrderBottom

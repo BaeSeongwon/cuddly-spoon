@@ -16,4 +16,4 @@ export const LEFT_BUTTON_TYPE = 0;
 export const RIGHT_BUTTON_TYPE = 1;
 
 /** @description ShapeCanvas에서 기본적으로 선택된 도형 */
-export const DEFAULT_SELECTED_SHAPE = "box";
+export const DEFAULT_SELECTED_SHAPE = "square";
