@@ -24,6 +24,11 @@ function ContextMenu({children, list}) {
     setVisible(false);
   }
 
+  const handleClickContextMenu = (e, callback) => {
+    callback(e);
+    handleClick();
+  }
+
   return (
     <div 
       onContextMenu={handleContextMenu}
@@ -61,7 +66,7 @@ function ContextMenu({children, list}) {
                   color: white;
                 }
               `}
-              onClick={handler}
+              onClick={(e) => handleClickContextMenu(e, handler)}
               onMouseDown={(e) => e.stopPropagation()}
               onMouseUp={(e) => e.stopPropagation()}
             >

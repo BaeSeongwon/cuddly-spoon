@@ -99,22 +99,24 @@ function Canvas() {
       `)}
       onMouseDown={handleMouseDown}
     >
-      {drawnShapeList.map((shape) => (
-        <Shape
-          canvasRef={canvasRef}
-          key={shape.getId()}
-          id={shape.getId()}
-          width={shape.getWidth()}
-          height={shape.getHeight()}
-          border={shape.getBorder()}
-          borderRadius={shape.getBorderRadius()}
-          position={shape.getPosition()}
-          left={shape.getLeft()}
-          top={shape.getTop()}
-          zIndex={shape.getZindex()}
-          onChangeShapeLocation={handleChangeShapeLocation}
-        />
-      ))}
+      {drawnShapeList.map((shape) => {
+        return (
+          <Shape
+            canvasRef={canvasRef}
+            key={shape.getId()}
+            id={shape.getId()}
+            width={shape.getWidth()}
+            height={shape.getHeight()}
+            border={shape.getBorder()}
+            borderRadius={shape.getBorderRadius()}
+            position={shape.getPosition()}
+            left={shape.getLeft()}
+            top={shape.getTop()}
+            zIndex={shape.getZindex()}
+            onChangeShapeLocation={handleChangeShapeLocation}
+          />
+        )
+      })}
     </div>
   )
 }

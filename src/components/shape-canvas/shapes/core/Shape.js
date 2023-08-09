@@ -125,6 +125,13 @@ class Shape {
     return this.#zIndex;
   }
 
+  setZindex(zIndex) {
+    if(!isNaN(zIndex)) {
+      console.log(this.#id, zIndex);
+      this.#zIndex = zIndex;
+    }
+  }
+
   setWidth(width) {
     this.#width = width;
   }

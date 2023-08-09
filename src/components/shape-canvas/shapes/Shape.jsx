@@ -1,5 +1,5 @@
 /** @jsxImportSource @emotion/react */
-import { useContext, useRef, useLayoutEffect } from "react";
+import { useContext, useRef, useLayoutEffect, useEffect } from "react";
 import { css } from "@emotion/react";
 import { ShapeCanvasContext } from "../ShapeCanvasProvider";
 import { LEFT_BUTTON_TYPE } from "../config";
@@ -30,12 +30,14 @@ function Shape(props) {
 
       ref.current.style.left = `${left}px`;
       ref.current.style.top = `${top}px`;
-
-      if(props.zIndex) {
-        ref.current.style.zIndex = `${props.zIndex}`;
-      }      
     }
-  }, [ref])
+  }, [ref]);
+
+  useEffect(() => {
+    if(!isNaN(props.zIndex)) {
+      ref.current.style.zIndex = `${props.zIndex}`;
+    }      
+  }, [props.zIndex]);
 
   const handleMouseDown = (e) => {
     e.stopPropagation();
@@ -73,6 +75,7 @@ function Shape(props) {
   const handleMouseUp = (e) => {
     e.stopPropagation();
     isDrag = false;
+    
     if(ref && ref.current) {
       ref.current.style.zIndex = `${props.zIndex}`;
       props.onChangeShapeLocation(props.id, ref.current.style.left, ref.current.style.top);

@@ -14,20 +14,22 @@ export const ShapeCanvasContext = createContext({
   canvasBoundary: null,
   setCanvasBoundary: () => {},
   getShapeZindex: () => {},
-  getMostTopZindex: () => {}
+  getMostTopZindex: () => {},
+  onChangeShapeOrderTop: () => {}, 
+  onChangeShapeOrderBottom: () => {}
 });
 
 export default function ShapeCanvasProvider({children}) {
   const [ selectedShapeType, setSelectedShapeType ] = useState(DEFAULT_SELECTED_SHAPE);
   const [ drawnShapeList, _setDrawnShapeList ] = useState([]);
   const [ selectedShapeId, setSelectedShapeId ] = useState(null);
-  const [ shapeZindex, setShapeZindex ] = useState(0);
+  const [ shapeZindex, setShapeZindex ] = useState(1);
   const [ canvasBoundary, setCanvasBoundary ] = useState({
     left: 0,
     right: 0,
     top: 0,
     bottom: 0
-  })
+  });
 
   useEffect(() => {
     const savedData = LocalStorage.get(STORAGE_SAVE_KEY, true);
@@ -64,17 +66,29 @@ export default function ShapeCanvasProvider({children}) {
     }
   }, [drawnShapeList])
 
+  /**
+   * @function 그려진 도형 전부 삭제 함수
+   */
   const onClearDrawnShapeList = () => {
     LocalStorage.remove(STORAGE_SAVE_KEY);
     _setDrawnShapeList([]);
+    setShapeZindex(0);
   }
 
+  /**
+   * @function z-index 제일 높은 값 가져오는 함수
+   * @return number 
+   */
   const getShapeZindex = () => {
     setShapeZindex(shapeZindex + 1);
 
     return shapeZindex;
   }
 
+  /**
+   * @function 도형
+   * @param {*} shapeList 
+   */
   const setDrawnShapeList = (shapeList) => {
     if(shapeList) {
       const shapeJsonList = shapeList.map(item => item.toJson());
@@ -86,6 +100,52 @@ export default function ShapeCanvasProvider({children}) {
 
   const getMostTopZindex = () => {
     return shapeZindex + 1;
+  }
+
+  const onChangeShapeOrderTop = (id) => {
+    if(id) {
+      const findMostTopZindex = drawnShapeList.reduce((acc, shape) => {
+        if(shape.getZindex() > acc) {
+          acc = shape.getZindex();
+        }
+
+        return acc;
+      }, 0);
+
+      _setDrawnShapeList(drawnShapeList.map(shape => {
+        if(shape.getId() === id) {
+          shape.setZindex(findMostTopZindex);
+        } else {
+          const modifyZindex = shape.getZindex() - 1;
+          shape.setZindex(modifyZindex);
+        }
+
+        return shape;
+      }));
+    }
+  }
+
+  const onChangeShapeOrderBottom = (id) => {
+    if(id) {
+      const findMostBottomZindex = drawnShapeList.reduce((acc, shape) => {
+        if(shape.getZindex() < acc) {
+          acc = shape.getZindex();
+        }
+
+        return acc;
+      }, 0);
+
+      _setDrawnShapeList(drawnShapeList.map(shape => {
+        if(shape.getId() === id) {
+          shape.setZindex(findMostBottomZindex);
+        } else {
+          const modifyZindex = shape.getZindex() + 1;
+          shape.setZindex(modifyZindex);
+        }
+
+        return shape;
+      }));
+    }
   }
 
   return (
@@ -101,7 +161,9 @@ export default function ShapeCanvasProvider({children}) {
         canvasBoundary,
         setCanvasBoundary,
         getShapeZindex,
-        getMostTopZindex
+        getMostTopZindex,
+        onChangeShapeOrderTop,
+        onChangeShapeOrderBottom
       }}
     >
       {children}
